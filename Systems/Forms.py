@@ -2,15 +2,16 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 import email_validator
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from Reservation import login_manager
-from model import my_cursor
+from model import connection
+import pymysql
 
-@login_manager.user_loader
+'''@login_manager.user_loader
 def load_user(email):
     query = f"SELECT email from customer WHERE email = '{email}'"
     my_cursor.execute(query)
     user = [i[0] for i in my_cursor if i[0] == email ]
     return user
+'''
 
 class RegistrationForm(FlaskForm):
     name = StringField('Name',
@@ -47,8 +48,10 @@ class RegistrationForm(FlaskForm):
     def validate_email(self, email):
         str_email = str(email.data)
         query = f"SELECT email from customer WHERE email = '{str_email}'"
+        my_cursor = connection.cursor(pymysql.cursors.DictCursor)
         my_cursor.execute(query)
         user = [i[0] for i in my_cursor if i[0] == str_email]
+        my_cursor.close()
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
 

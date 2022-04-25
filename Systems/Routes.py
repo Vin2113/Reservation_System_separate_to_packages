@@ -3,10 +3,17 @@ from Forms import RegistrationForm, LoginForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import render_template, flash, redirect, session, request, url_for
 import datetime
-from model import my_cursor, connection
+from model import connection
+import pymysql
 @app.route('/')
 @app.route('/home')
 def home():
+    '''    with connection.cursor(pymysql.cursors.DictCursor) as mycursor:
+        query = "select * from flight where status = 'Upcoming'"
+        mycursor.execute(query)
+        data = mycursor.fetchall()
+        mycursor.close()'''
+
     return render_template('Layout.html', title='Home')
 
 @app.route('/register', methods=["GET", 'POST'])
@@ -22,8 +29,10 @@ def register():
         exp_time = datetime.datetime(int(form.passport_expiration.data[-4:-1]), int(form.passport_expiration.data[0:2]), int(form.passport_expiration.data[3:5]))
         dob_time = datetime.datetime(int(form.date_of_birth.data[-4:-1]), int(form.date_of_birth.data[0:2]), int(form.date_of_birth.data[3:5]))
         query = f"Insert INTO customer VALUES('{email}', '{form.name.data}', '{hashed_password}','{form.building_number.data}','{form.street.data}','{form.city.data}','{form.state.data}', {phone_number} ,'{form.passport_number.data}','{exp_time}','{form.passport_country.data}','{dob_time}')"
+        my_cursor = connection.cursor()
         my_cursor.execute(query)
         connection.commit()
+        my_cursor.close()
         flash(f'You can now login {form.name.data}!', 'success')
         return redirect(url_for('login'))
     return render_template('Register.html', title='Register', form=form)
@@ -36,12 +45,13 @@ def login():
         str_email = str(form.email.data)
         password = form.password.data
         query = f"SELECT email, password from customer WHERE email = '{str_email}'"
+        my_cursor = connection.cursor()
         my_cursor.execute(query)
         account = my_cursor.fetchone()
         #checking user data from database for verification
         if account and bcrypt.check_password_hash(account[1],form.password.data):
             session['loggedin'] = True
-            session['email'] = account[0]
+            session['customer'] = account[0]
             session['password'] = account[1]
             flash('Login Successful', 'success')
             return redirect(url_for('home'))
@@ -53,10 +63,20 @@ def login():
 def logout():
     # Remove session data, this will log the user out
    session.pop('loggedin', None)
+
    session.pop('email', None)
    session.pop('password', None)
    # Redirect to login page
    return redirect(url_for('login'))
+
+@app.route('/customer_purchase', methods = ["GET", 'Post'])
+def purchase():
+        with connection.cursor(pymysql.cursors.DictCursor) as mycursor:
+            query = "select * from available_flights"
+            mycursor.execute(query)
+            data = mycursor.fetchall()
+
+
 
 
 
