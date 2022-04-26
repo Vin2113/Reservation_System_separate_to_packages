@@ -43,7 +43,6 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         str_email = str(form.email.data)
-        password = form.password.data
         query = f"SELECT email, password from customer WHERE email = '{str_email}'"
         my_cursor = connection.cursor()
         my_cursor.execute(query)
@@ -75,6 +74,7 @@ def purchase():
             query = "select * from available_flights"
             mycursor.execute(query)
             data = mycursor.fetchall()
+
 
 
 

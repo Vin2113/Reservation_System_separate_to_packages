@@ -64,3 +64,4 @@ class LoginForm(FlaskForm):
                            validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+# class PurchaseForm(FlaskForm):
