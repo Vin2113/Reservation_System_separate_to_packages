@@ -64,4 +64,15 @@ class LoginForm(FlaskForm):
                            validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
-# class PurchaseForm(FlaskForm):
+
+class Booking_agent_LoginForm(FlaskForm):
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()])
+
+    password = PasswordField('Password',
+                        validators=[DataRequired()])
+    Id = StringField('Booking Agent ID',
+                        validators=[DataRequired()])
+
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
