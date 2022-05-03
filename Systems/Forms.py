@@ -5,13 +5,6 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from model import connection
 import pymysql
 
-'''@login_manager.user_loader
-def load_user(email):
-    query = f"SELECT email from customer WHERE email = '{email}'"
-    my_cursor.execute(query)
-    user = [i[0] for i in my_cursor if i[0] == email ]
-    return user
-'''
 
 class RegistrationForm(FlaskForm):
     name = StringField('Name',
@@ -64,6 +57,19 @@ class LoginForm(FlaskForm):
                            validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+class Airline_staff_LoginForm(FlaskForm):
+    name = StringField('Username',
+                       validators=[DataRequired(), Length(max=50)])
+
+    password = PasswordField('Password',
+                        validators=[DataRequired()])
+    airline_name = StringField('Airline Name',
+                        validators=[DataRequired()])
+
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
+
 
 class Booking_agent_LoginForm(FlaskForm):
     email = StringField('Email',

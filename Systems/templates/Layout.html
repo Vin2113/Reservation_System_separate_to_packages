@@ -34,7 +34,9 @@
               {% if session['loggedin'] == True %}
                 <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
               {% else %}
-                <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
+                <a class="nav-item nav-link" href="{{ url_for('login') }}">Customer Login</a>
+                <a class="nav-item nav-link" href="{{ url_for('agent_login') }}">Agent Login</a>
+                <a class="nav-item nav-link" href="{{ url_for('staff_login') }}">Staff Login</a>
                 <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
               {% endif %}
             </div>

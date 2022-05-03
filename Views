@@ -54,3 +54,63 @@ from flight inner join
 (Select *
 From purchases natural join ticket) as T on flight.flight_num = T.flight_num
 Where customer_email = {input_email}
+
+
+
+Airline_Staff queries for checking permissions
+
+#Admin permission query
+SELECT permission_type
+From permission
+WHERE username = {str_username}
+
+#General Staff queries
+
+#View flights from their airline
+SELECT *
+From flight
+WHERE airline_name = session['airline_name'] and status = {input_status}
+
+#List of customers for a certain flight
+Select customer_email
+From ticket natural join purchases
+Where airline_name = session[airline_name] and flight_num = {input_flight_num}
+
+# See all flights taken by a certain customer
+Select flight_num
+From ticket natural join purchases
+Where airline_name = session[airline_name] and customer_email = {input_customer_email}
+
+#Most Frequent customer
+Select customer_email, count(ticket_id)
+From ticket natural join purchases
+Where airline_name = session[airline_name]
+group by customer_email
+Limit 1;
+
+Ammount of tickets sold in a month
+Select count(ticket_id)
+From ticket natural join purchases
+Where airline_name = session[airline_name]
+group by customer_email
+Where purchase_date > Date_Sub(curdate(), INTERVAL 30 DAY) and airline_name = {airline_name};
+Limit 1;
+
+# Top booking agents
+Create View top_booking_agent as
+Select email, sum(price * .1) as commissions
+from flight inner join
+(Select *
+From booking_agent natural join purchases natural join ticket) as T on flight.flight_num = T.flight_num
+Where airline_name = session[airline_name]
+group by email
+
+#Admin insert airplane query
+
+Insert into airplane Values(session['airline_name'], airplane_id, seats)
+Insert into flight Values(session['airline_name'], flight_number, departure_airport, departure_time, arrival_airport, arrival_time, price, status, airplane_id)
+
+Operator queries
+Update flight
+Set status = '{input_status}'
+Where flight_num = {input_flight_num)
