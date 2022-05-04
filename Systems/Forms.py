@@ -5,13 +5,6 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from model import connection
 import pymysql
 
-'''@login_manager.user_loader
-def load_user(email):
-    query = f"SELECT email from customer WHERE email = '{email}'"
-    my_cursor.execute(query)
-    user = [i[0] for i in my_cursor if i[0] == email ]
-    return user
-'''
 
 class RegistrationForm(FlaskForm):
     name = StringField('Name',
@@ -50,10 +43,61 @@ class RegistrationForm(FlaskForm):
         query = f"SELECT email from customer WHERE email = '{str_email}'"
         my_cursor = connection.cursor(pymysql.cursors.DictCursor)
         my_cursor.execute(query)
-        user = [i[0] for i in my_cursor if i[0] == str_email]
+        user = my_cursor.fetchone()
         my_cursor.close()
         if user:
-            raise ValidationError('That email is taken. Please choose a different one.')
+            raise ValidationError('This email is taken. Please choose a different one.')
+
+class Agent_RegistrationForm(FlaskForm):
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()])
+    password = PasswordField('Password',
+                           validators=[DataRequired(), Length(max=20)])
+
+    confirm_password = PasswordField('Confirm Password',
+                           validators=[DataRequired(), EqualTo('password')])
+    Id = StringField('Booking Agent ID',
+                        validators=[DataRequired()])
+    submit = SubmitField('Register')
+    def validate_email(self, email):
+        str_email = str(email.data)
+        query = f"SELECT email from booking_agent WHERE email = '{str_email}'"
+        my_cursor = connection.cursor(pymysql.cursors.DictCursor)
+        my_cursor.execute(query)
+        user = my_cursor.fetchone()
+        my_cursor.close()
+        if user:
+            raise ValidationError('This email is taken. Please choose a different one.')
+
+class Airline_staff_RegistrationForm(FlaskForm):
+    username = StringField('Username',
+                       validators=[DataRequired(), Length(max=50)])
+    first_name = StringField('First Name',
+                       validators=[DataRequired(), Length(max=50)])
+    last_name = StringField('Last Name',
+                       validators=[DataRequired(), Length(max=50)])
+
+    password = PasswordField('Password',
+                        validators=[DataRequired()])
+
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), EqualTo('password')])
+    airline_name = StringField('Airline Name',
+                        validators=[DataRequired()])
+
+    date_of_birth = StringField('Date of Birth mm/dd/yyyy',
+                               validators=[DataRequired(), Length(max=10)])
+    submit = SubmitField('Register')
+    def validate_username(self, username):
+        str_username = str(username.data)
+        query = f"SELECT username from airline_staff WHERE username = '{str_username}'"
+        my_cursor = connection.cursor(pymysql.cursors.DictCursor)
+        my_cursor.execute(query)
+        user = my_cursor.fetchone()
+        my_cursor.close()
+        if user:
+            raise ValidationError('This email is taken. Please choose a different one.')
+
 
 
 class LoginForm(FlaskForm):
@@ -64,6 +108,19 @@ class LoginForm(FlaskForm):
                            validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+class Airline_staff_LoginForm(FlaskForm):
+    name = StringField('Username',
+                       validators=[DataRequired(), Length(max=50)])
+
+    password = PasswordField('Password',
+                        validators=[DataRequired()])
+    airline_name = StringField('Airline Name',
+                        validators=[DataRequired()])
+
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
+
 
 class Booking_agent_LoginForm(FlaskForm):
     email = StringField('Email',
