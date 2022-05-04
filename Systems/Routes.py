@@ -1,5 +1,5 @@
 from Reservation import app, bcrypt
-from Forms import RegistrationForm, LoginForm, Booking_agent_LoginForm, Airline_staff_LoginForm
+from Forms import RegistrationForm, Agent_RegistrationForm, Airline_staff_RegistrationForm, LoginForm, Booking_agent_LoginForm, Airline_staff_LoginForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flask import render_template, flash, redirect, session, request, url_for
 import datetime
@@ -37,6 +37,41 @@ def register():
         flash(f'You can now login {form.name.data}!', 'success')
         return redirect(url_for('login'))
     return render_template('Register.html', title='Register', form=form)
+@app.route('/agent_register', methods=["GET", 'POST'])
+def agent_register():
+    form = Agent_RegistrationForm()
+    if form.validate_on_submit():
+        # #verify email unique
+        #insert into database
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        email = str(form.email.data)
+        query = f"Insert INTO booking_agent VALUES('{email}', '{hashed_password}','{form.Id.data}',)"
+        my_cursor = model.connection.cursor()
+        my_cursor.execute(query)
+        model.connection.commit()
+        my_cursor.close()
+        flash(f'You can now login {form.email.data}!', 'success')
+        return redirect(url_for('agent_login'))
+    return render_template('agent_register.html', title='Register', form=form)
+
+@app.route('/staff_register', methods=["GET", 'POST'])
+def staff_register():
+    form = Airline_staff_RegistrationForm()
+    if form.validate_on_submit():
+        # #verify email unique
+        #insert into database
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        username = str(form.username.data)
+        dob_time = datetime.datetime(int(form.date_of_birth.data[-4:-1]), int(form.date_of_birth.data[0:2]),
+                                     int(form.date_of_birth.data[3:5]))
+        query = f"Insert INTO airline_staff VALUES('{username}', '{hashed_password}','{form.first_name.data}','{form.last_name.data}', {dob_time}, '{form.airline_name.data}',)"
+        my_cursor = model.connection.cursor()
+        my_cursor.execute(query)
+        model.connection.commit()
+        my_cursor.close()
+        flash(f'You can now login {form.first_name.data}!', 'success')
+        return redirect(url_for('staff_login'))
+    return render_template('staff_register.html', title='Register', form=form)
 
 
 @app.route('/customer_login', methods=["GET", 'POST'])

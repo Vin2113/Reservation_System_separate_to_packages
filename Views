@@ -56,7 +56,7 @@ From purchases natural join ticket) as T on flight.flight_num = T.flight_num
 Where customer_email = {input_email}
 
 
-
+Airline use cases
 Airline_Staff queries for checking permissions
 
 #Admin permission query
@@ -88,7 +88,7 @@ Where airline_name = session[airline_name]
 group by customer_email
 Limit 1;
 
-Ammount of tickets sold in a month
+Amount of tickets sold in a month
 Select count(ticket_id)
 From ticket natural join purchases
 Where airline_name = session[airline_name]
@@ -108,9 +108,28 @@ group by email
 #Admin insert airplane query
 
 Insert into airplane Values(session['airline_name'], airplane_id, seats)
+
+Insert flight into flights
 Insert into flight Values(session['airline_name'], flight_number, departure_airport, departure_time, arrival_airport, arrival_time, price, status, airplane_id)
 
-Operator queries
+Admin insert airport for airline
+#create new table to keep track of information
+
+#adding new airports
+create table airline_available_airports as
+select airline.airline_name, airport.airport_name
+from airline,airports
+
+If airport did not exist
+
+Insert into airports Values(airport_name, airport_city)_
+Insert into airline_available_airports Values(session['airline_name'], airport_name)
+
+#Giving people permission
+Insert into permissions Values(username, permission_type)
+
+
+#Operator queries
 Update flight
 Set status = '{input_status}'
 Where flight_num = {input_flight_num)
